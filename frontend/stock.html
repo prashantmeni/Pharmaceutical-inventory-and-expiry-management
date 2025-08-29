@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Stock - Maruti Pharmaceuticals</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fafafa;
+    }
+
+    /* Header */
+    #head {
+      background-color: lightblue;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    #head-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #head-left img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    #head h1 {
+      color: darkblue;
+      font-size: 24px;
+      margin: 0;
+    }
+
+    /* Profile Button */
+    #profile-container {
+      position: relative;
+    }
+
+    #profile-btn {
+      background-color: darkblue;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    #profile-btn:hover {
+      background-color: navy;
+    }
+
+    /* Dropdown */
+    .dropdown {
+      position: absolute;
+      top: 45px;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      display: none;
+      flex-direction: column;
+      min-width: 150px;
+      z-index: 1000;
+    }
+    .dropdown a {
+      padding: 10px;
+      text-decoration: none;
+      color: #333;
+      transition: background 0.3s;
+    }
+    .dropdown a:hover {
+      background: #f0f0f0;
+    }
+
+    /* Navigation */
+    .navigation {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      background-color: #fff;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: bold;
+      border-bottom: 1px solid #ddd;
+      flex-wrap: wrap;
+    }
+
+    .navigation a {
+      color: darkred;
+      text-decoration: none;
+      position: relative;
+    }
+
+    .navigation a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -5px;
+      width: 0%;
+      height: 2px;
+      background: darkred;
+      transition: width 0.3s ease-in-out;
+    }
+
+    .navigation a:hover::after {
+      width: 100%;
+    }
+
+    /* Dashboard */
+    .dashboard {
+      width: 90%;
+      margin: 20px auto;
+      padding: 10px;
+    }
+
+    .dashboard h2 {
+      text-align: center;
+      color: darkblue;
+      margin-bottom: 20px;
+    }
+
+    .stock-form {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .stock-form label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .stock-form input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .stock-form button {
+      width: 100%;
+      padding: 12px;
+      background-color: darkblue;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .stock-form button:hover {
+      background-color: navy;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background-color: #f0f0f0;
+      font-size: 12px;
+      color: #666;
+      border-top: 1px solid #ddd;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div id="head">
+    <div id="head-left">
+      <img src="https://via.placeholder.com/40" alt="Logo">
+      <h1>Maruti Pharmaceuticals</h1>
+    </div>
+    <div id="profile-container">
+      <button id="profile-btn">Profile ▼</button>
+      <div class="dropdown" id="dropdownMenu">
+        <a href="#">My Account</a>
+        <a href="#">Settings</a>
+        <a href="#">Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="navigation">
+    <a href="index.html">Home</a>
+    <a href="stock.html">Add Stock</a>
+    <a href="inventory.html">Inventory</a>
+    <a href="about.html">About Us</a>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard">
+    <h2>Add New Stock</h2>
+    <form class="stock-form" id="stockForm">
+      <label for="medicine">Medicine Name</label>
+      <input type="text" id="medicine" name="medicine" placeholder="Enter medicine name" required>
+
+      <label for="strength">Strength</label>
+      <input type="text" id="strength" name="strength" placeholder="e.g., 500mg, 250mg" required>
+
+      <label for="units">Available Units</label>
+      <input type="number" id="units" name="units" placeholder="Enter number of units" required>
+
+      <label for="date">Last Updated</label>
+      <input type="date" id="date" name="date" required>
+
+      <button type="submit">Add Stock</button>
+    </form>
+  </div>
+
+  <footer>
+    &copy; 2025 Maruti Pharmaceuticals. All rights reserved.
+  </footer>
+
+  <script>
+    // Profile dropdown
+    const profileBtn = document.getElementById("profile-btn");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+
+    profileBtn.addEventListener("click", () => {
+      dropdownMenu.style.display = dropdownMenu.style.display === "flex" ? "none" : "flex";
+    });
+
+    window.addEventListener("click", (e) => {
+      if (!profileBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.style.display = "none";
+      }
+    });
+
+    // Form submission (temporary demo)
+    document.getElementById("stockForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      alert("Stock added successfully!");
+      this.reset();
+    });
+  </script>
+</body>
+</html>

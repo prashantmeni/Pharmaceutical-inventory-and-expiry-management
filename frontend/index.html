@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Maruti Pharmaceuticals</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fafafa;
+    }
+
+    /* Header */
+    #head {
+      background-color: lightblue;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    #head-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #head-left img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    #head h1 {
+      color: darkblue;
+      font-size: 24px;
+      margin: 0;
+    }
+
+    /* Profile Button */
+    #profile-container {
+      position: relative;
+    }
+
+    #profile-btn {
+      background-color: darkblue;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    #profile-btn:hover {
+      background-color: navy;
+    }
+
+    /* Dropdown */
+    .dropdown {
+      position: absolute;
+      top: 45px;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      display: none;
+      flex-direction: column;
+      min-width: 150px;
+      z-index: 1000;
+    }
+    .dropdown a {
+      padding: 10px;
+      text-decoration: none;
+      color: #333;
+      transition: background 0.3s;
+    }
+    .dropdown a:hover {
+      background: #f0f0f0;
+    }
+
+    /* Navigation */
+    .navigation {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      background-color: #fff;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: bold;
+      border-bottom: 1px solid #ddd;
+      flex-wrap: wrap;
+    }
+
+    .navigation a {
+      color: darkred;
+      text-decoration: none;
+      position: relative;
+    }
+
+    .navigation a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -5px;
+      width: 0%;
+      height: 2px;
+      background: darkred;
+      transition: width 0.3s ease-in-out;
+    }
+
+    .navigation a:hover::after {
+      width: 100%;
+    }
+
+    /* Slider */
+    .slider {
+      margin: 20px auto;
+      width: 90%;
+      height: 250px;
+      background-color: #e0e0e0;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+      font-size: 20px;
+      font-weight: bold;
+      transition: all 0.5s ease-in-out;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* Dashboard */
+    .dashboard {
+      width: 90%;
+      margin: 20px auto;
+      padding: 10px;
+    }
+    .dashboard h2 {
+      text-align: center;
+      color: darkblue;
+      margin-bottom: 20px;
+    }
+    .stock-card {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .stock-card:hover {
+      transform: scale(1.02);
+    }
+
+    /* Search */
+    .search-box {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .search-box input {
+      width: 60%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    /* Carousel */
+    .carousel {
+      width: 90%;
+      margin: 20px auto;
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .carousel-items {
+      display: flex;
+      gap: 10px;
+      transition: transform 0.5s ease-in-out;
+    }
+    .item {
+      flex: 0 0 30%;
+      background-color: #dff0d8;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .carousel button {
+      position: absolute;
+      top: 40%;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+    .carousel button:hover {
+      background: rgba(0,0,0,0.7);
+    }
+    .carousel .prev {
+      left: 10px;
+    }
+    .carousel .next {
+      right: 10px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background-color: #f0f0f0;
+      font-size: 12px;
+      color: #666;
+      border-top: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div id="head">
+    <div id="head-left">
+      <img src="https://via.placeholder.com/40" alt="Logo">
+      <h1>Maruti Pharmaceuticals</h1>
+    </div>
+    <div id="profile-container">
+      <button id="profile-btn">Profile ▼</button>
+      <div class="dropdown" id="dropdownMenu">
+        <a href="#">My Account</a>
+        <a href="#">Settings</a>
+        <a href="#">Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="navigation">
+    <a href="index.html">Home</a>
+    <a href="stock.html">Add Stock</a>
+    <a href="inventory.html">Inventory</a>
+    <a href="about.html">About Us</a>
+  </div>
+
+  <!-- Slider -->
+  <div class="slider" id="sliderText">
+    Welcome to Maruti Pharmaceuticals
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard">
+    <h2>Stock Overview</h2>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search medicines...">
+    </div>
+    <div id="stockContainer"></div>
+  </div>
+
+  <!-- Carousel -->
+  <div class="carousel">
+    <h2>Featured Products</h2>
+    <div class="carousel-items" id="carouselItems">
+      <div class="item">Vitamin C Tablets</div>
+      <div class="item">Pain Relief Gel</div>
+      <div class="item">Antiseptic Cream</div>
+      <div class="item">Cough Syrup</div>
+      <div class="item">Diabetes Care Kit</div>
+    </div>
+    <button class="prev">❮</button>
+    <button class="next">❯</button>
+  </div>
+
+  <footer>
+    &copy; 2025 Maruti Pharmaceuticals. All rights reserved.
+  </footer>
+
+  <script>
+    // Stock data
+    const stocks = [
+      { name: "Paracetamol 500mg", units: 1200 },
+      { name: "Amoxicillin 250mg", units: 850 },
+      { name: "Vitamin C 1000mg", units: 600 },
+      { name: "Ibuprofen 400mg", units: 950 }
+    ];
+
+    const stockContainer = document.getElementById("stockContainer");
+
+    function renderStocks(filter = "") {
+      stockContainer.innerHTML = "";
+      const filtered = stocks.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()));
+      filtered.forEach(stock => {
+        const div = document.createElement("div");
+        div.classList.add("stock-card");
+        div.innerHTML = `
+          <p><strong>${stock.name}</strong></p>
+          <p>Available Units: ${stock.units}</p>
+          <p>Last Updated: ${new Date().toLocaleDateString()}</p>
+        `;
+        stockContainer.appendChild(div);
+      });
+    }
+
+    // Search
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      renderStocks(e.target.value);
+    });
+    renderStocks();
+
+    // Slider
+    const sliderText = document.getElementById("sliderText");
+    const sliderMessages = [
+      "Welcome to Maruti Pharmaceuticals",
+      "Trusted Medicines, Quality Care",
+      "Your Health is Our Priority"
+    ];
+    let sliderIndex = 0;
+    setInterval(() => {
+      sliderIndex = (sliderIndex + 1) % sliderMessages.length;
+      sliderText.textContent = sliderMessages[sliderIndex];
+    }, 3000);
+
+    // Carousel
+    const carousel = document.getElementById("carouselItems");
+    let index = 0;
+    const items = carousel.children;
+    const totalItems = items.length;
+    const showItems = 3;
+
+    function updateCarousel() {
+      carousel.style.transform = `translateX(-${index * (100 / showItems)}%)`;
+    }
+
+    document.querySelector(".next").addEventListener("click", () => {
+      index = (index + 1) % (totalItems - showItems + 1);
+      updateCarousel();
+    });
+
+    document.querySelector(".prev").addEventListener("click", () => {
+      index = (index - 1 + (totalItems - showItems + 1)) % (totalItems - showItems + 1);
+      updateCarousel();
+    });
+
+    setInterval(() => {
+      index = (index + 1) % (totalItems - showItems + 1);
+      updateCarousel();
+    }, 4000);
+
+    // Profile dropdown
+    const profileBtn = document.getElementById("profile-btn");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+
+    profileBtn.addEventListener("click", () => {
+      dropdownMenu.style.display = dropdownMenu.style.display === "flex" ? "none" : "flex";
+    });
+
+    window.addEventListener("click", (e) => {
+      if (!profileBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>

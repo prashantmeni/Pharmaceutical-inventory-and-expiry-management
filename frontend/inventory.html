@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inventory - Maruti Pharmaceuticals</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #fafafa; }
+    /* Header */
+    #head { background: lightblue; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+    #head-left { display: flex; align-items: center; gap: 10px; }
+    #head-left img { width: 40px; height: 40px; border-radius: 50%; }
+    #head h1 { color: darkblue; font-size: 24px; margin: 0; }
+    /* Profile */
+    #profile-container { position: relative; display: flex; align-items: center; gap: 8px; }
+    #profile-pic { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.2); cursor: pointer; }
+    /* Nav */
+    .navigation { display: flex; justify-content: center; gap: 30px; background: #fff; padding: 15px; font-size: 15px; font-weight: bold; border-bottom: 1px solid #ddd; flex-wrap: wrap; }
+    .navigation a { color: darkred; text-decoration: none; position: relative; }
+    .navigation a::after { content:""; position:absolute; left:0; bottom:-5px; width:0; height:2px; background:darkred; transition:width .3s; }
+    .navigation a:hover::after { width:100%; }
+    /* Dashboard */
+    .dashboard { width: 90%; margin: 20px auto; padding: 10px; }
+    .dashboard h2 { text-align: center; color: darkblue; margin-bottom: 18px; }
+    .gauges { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+    .gauge-card { background:#fff; padding: 16px; border-radius: 10px; box-shadow:0 2px 8px rgba(0,0,0,.08); text-align:center; }
+    .gauge-card h3 { margin: 0 0 8px; color:#333; font-size:16px; }
+    .meta { font-size: 12px; color:#666; margin-top:8px; }
+    /* Inventory table (kept minimal; can plug your existing table here if needed) */
+    .panel { background:#fff; margin-top: 20px; padding: 12px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+    .panel .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .panel input { flex:1; min-width: 240px; padding:10px; border:1px solid #ccc; border-radius:8px; }
+    table { width:100%; border-collapse:collapse; margin-top:12px; }
+    th, td { padding: 10px 12px; border-bottom:1px solid #eee; text-align:left; }
+    th { background:#f7fbff; color:#0b3a75; cursor:pointer; }
+    tr:hover { background:#fafcff; }
+    /* Loading & error badges */
+    .badge { display:inline-block; padding:4px 8px; border-radius: 999px; font-size: 12px; }
+    .badge.info { background:#e1f5fe; color:#0277bd; }
+    .badge.warn { background:#fff3e0; color:#e65100; }
+    .badge.err  { background:#ffebee; color:#c62828; }
+    footer { text-align:center; padding: 15px; background:#f0f0f0; font-size:12px; color:#666; border-top:1px solid #ddd; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div id="head">
+    <div id="head-left">
+      <img src="https://via.placeholder.com/40" alt="Logo" />
+      <h1>Maruti Pharmaceuticals</h1>
+    </div>
+    <div id="profile-container">
+      <img id="profile-pic" src="https://via.placeholder.com/40" alt="Profile" />
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="navigation">
+    <a href="index.html">Home</a>
+    <a href="stock.html">Add Stock</a>
+    <a href="inventory.html">Inventory</a>
+    <a href="about.html">About Us</a>
+  </div>
+
+  <!-- Gauges -->
+  <div class="dashboard">
+    <h2>Inventory Monitoring</h2>
+    <div class="gauges">
+      <div class="gauge-card">
+        <h3>Available Stock</h3>
+        <canvas id="g_avail"></canvas>
+        <div class="meta" id="m_avail"></div>
+      </div>
+      <div class="gauge-card">
+        <h3>Expiry Stock</h3>
+        <canvas id="g_exp"></canvas>
+        <div class="meta" id="m_exp"></div>
+      </div>
+      <div class="gauge-card">
+        <h3>Sales</h3>
+        <canvas id="g_sales"></canvas>
+        <div class="meta" id="m_sales"></div>
+      </div>
+      <div class="gauge-card">
+        <h3>Orders Fulfilled</h3>
+        <canvas id="g_orders"></canvas>
+        <div class="meta" id="m_orders"></div>
+      </div>
+    </div>
+
+    <!-- Inventory list (sample, fills from API) -->
+    <div class="panel">
+      <div class="row">
+        <span class="badge info" id="statusBadge">Loading KPIs…</span>
+        <input type="text" id="searchInput" placeholder="Search medicine…">
+      </div>
+      <table id="inventoryTable">
+        <thead>
+          <tr>
+            <th data-col="name">Medicine ⬍</th>
+            <th data-col="strength">Strength ⬍</th>
+            <th data-col="units">Units ⬍</th>
+            <th data-col="expiry">Expiry ⬍</th>
+            <th data-col="updatedAt">Last Updated ⬍</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>© 2025 Maruti Pharmaceuticals. All rights reserved.</footer>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    /** ======= CONFIGURE YOUR ENDPOINTS HERE ======= */
+    const KPI_API = '/api/kpis';          // returns { availablePct, expiryPct, salesPct, ordersPct, updatedAt }
+    const INVENTORY_API = '/api/inventory';// returns [{ name, strength, units, expiry, updatedAt }, ...]
+    const REFRESH_MS = 15000;              // auto-refresh every 15s
+
+    /** ======= GAUGE HELPERS (doughnut-as-gauge) ======= */
+    function makeGauge(ctx, pct, color) {
+      const clamped = Math.max(0, Math.min(100, pct|0));
+      return new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Value','Remaining'],
+          datasets: [{
+            data: [clamped, 100 - clamped],
+            backgroundColor: [color, '#eaeaea'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          rotation: -90,          // start at top
+          circumference: 180,     // half circle
+          cutout: '75%',
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false }
+          }
+        }
+      });
+    }
+    function setGaugeValue(chart, pct) {
+      const v = Math.max(0, Math.min(100, pct|0));
+      chart.data.datasets[0].data[0] = v;
+      chart.data.datasets[0].data[1] = 100 - v;
+      chart.update('active');
+    }
+
+    /** ======= INIT GAUGES ======= */
+    const gAvail  = makeGauge(document.getElementById('g_avail'), 0,  '#4caf50');
+    const gExp    = makeGauge(document.getElementById('g_exp'),   0,  '#f44336');
+    const gSales  = makeGauge(document.getElementById('g_sales'), 0,  '#2196f3');
+    const gOrders = makeGauge(document.getElementById('g_orders'),0,  '#ff9800');
+
+    const mAvail  = document.getElementById('m_avail');
+    const mExp    = document.getElementById('m_exp');
+    const mSales  = document.getElementById('m_sales');
+    const mOrders = document.getElementById('m_orders');
+
+    const statusBadge = document.getElementById('statusBadge');
+    function setStatus(type, text){
+      statusBadge.textContent = text;
+      statusBadge.className = 'badge ' + (type || 'info');
+    }
+
+    /** ======= API FETCHERS WITH FALLBACK ======= */
+    async function fetchJSON(url, fallbackKey) {
+      try {
+        const res = await fetch(url, { headers: { 'Accept':'application/json' } });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        // cache for offline / quick load
+        if (fallbackKey) localStorage.setItem(fallbackKey, JSON.stringify({ data, ts: Date.now() }));
+        return data;
+      } catch (e) {
+        const cached = localStorage.getItem(fallbackKey || '');
+        if (cached) {
+          const { data } = JSON.parse(cached);
+          setStatus('warn', 'Using cached data (offline/failed API)');
+          return data;
+        }
+        throw e;
+      }
+    }
+
+    /** ======= BIND GAUGES TO KPI API ======= */
+    async function loadKPIs() {
+      const data = await fetchJSON(KPI_API, 'cache_kpis');
+      // expected data shape:
+      // { availablePct: 75, expiryPct: 12, salesPct: 58, ordersPct: 87, updatedAt: "2025-08-28T12:23:45Z" }
+      setGaugeValue(gAvail,  data.availablePct ?? 0);
+      setGaugeValue(gExp,    data.expiryPct ?? 0);
+      setGaugeValue(gSales,  data.salesPct ?? 0);
+      setGaugeValue(gOrders, data.ordersPct ?? 0);
+
+      mAvail.textContent  = (data.availablePct ?? 0) + '% of capacity';
+      mExp.textContent    = (data.expiryPct ?? 0) + '% near/expired';
+      mSales.textContent  = (data.salesPct ?? 0) + '% of target';
+      mOrders.textContent = (data.ordersPct ?? 0) + '% fulfilled';
+
+      const ts = data.updatedAt ? new Date(data.updatedAt) : new Date();
+      setStatus('info', 'Last update: ' + ts.toLocaleString());
+    }
+
+    /** ======= INVENTORY TABLE: SEARCH + SORT + API ======= */
+    const tbody = document.getElementById('tbody');
+    const searchInput = document.getElementById('searchInput');
+    let invData = [];
+    let sortState = { col: 'name', dir: 'asc' };
+
+    function renderTable() {
+      const q = (searchInput.value || '').toLowerCase();
+      const filtered = invData.filter(row => (
+        (row.name||'').toLowerCase().includes(q) ||
+        (row.strength||'').toLowerCase().includes(q) ||
+        String(row.units||'').toLowerCase().includes(q)
+      ));
+      tbody.innerHTML = filtered.map(r => `
+        <tr>
+          <td>${escapeHTML(r.name)}</td>
+          <td>${escapeHTML(r.strength || '')}</td>
+          <td>${Number(r.units||0)}</td>
+          <td>${escapeHTML(formatDate(r.expiry))}</td>
+          <td>${escapeHTML(formatDate(r.updatedAt))}</td>
+        </tr>
+      `).join('');
+    }
+    function sortBy(col) {
+      const dir = (sortState.col === col && sortState.dir === 'asc') ? 'desc' : 'asc';
+      sortState = { col, dir };
+      invData.sort((a,b) => {
+        const x = (a[col] ?? '');
+        const y = (b[col] ?? '');
+        if (col === 'units') return dir === 'asc' ? x - y : y - x;
+        const sx = String(x).toLowerCase(), sy = String(y).toLowerCase();
+        return dir === 'asc' ? sx.localeCompare(sy) : sy.localeCompare(sx);
+      });
+      renderTable();
+    }
+    function attachSortHandlers() {
+      document.querySelectorAll('th[data-col]').forEach(th => {
+        th.addEventListener('click', () => sortBy(th.dataset.col));
+      });
+    }
+    function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function formatDate(d){
+      if (!d) return '';
+      const dt = new Date(d);
+      if (String(dt) === 'Invalid Date') return d;
+      return dt.toLocaleDateString();
+    }
+
+    async function loadInventory() {
+      const data = await fetchJSON(INVENTORY_API, 'cache_inventory');
+      // expected: [{ name, strength, units, expiry, updatedAt }, ...]
+      invData = Array.isArray(data) ? data.slice() : [];
+      // If your Add Stock page writes to localStorage, merge it here:
+      const addedLocal = JSON.parse(localStorage.getItem('added_stock') || '[]');
+      if (addedLocal.length) {
+        invData = [...invData, ...addedLocal];
+      }
+      sortBy(sortState.col); // will render after sort
+    }
+
+    /** ======= AUTO REFRESH LOOP ======= */
+    async function refreshAll() {
+      try {
+        await Promise.all([loadKPIs(), loadInventory()]);
+      } catch (e) {
+        console.error(e);
+        setStatus('err', 'Could not reach API');
+      }
+    }
+    attachSortHandlers();
+    searchInput.addEventListener('input', renderTable);
+    refreshAll();
+    setInterval(refreshAll, REFRESH_MS);
+  </script>
+</body>
+</html>
